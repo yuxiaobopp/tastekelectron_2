@@ -1,0 +1,88 @@
+打包时候，没有配置npm run encrypt的情况下，去掉下面的"!electron/"    
+ "files": [
+      "**/*",
+      "!frontend/",
+      "!run/",
+      "!logs/",
+      "!data/",
+"!electron/"      
+    ],
+
+因为不去掉，会报错
+A JavaScript error occurred in the main process :Uncaught Exception: AssertionError[ERR_ASSERTION]:Directory out\win-ia32-unpacked\resources\app.asar\electron not exists at new EeCore
+因为是排除了文件
+参考语雀https://www.yuque.com/u34495/ee-doc/mmr6mu
+
+~~~！！！！nodejs 要装低版本，14.20.1
+
+---
+electron-egg\public 下的dist文件夹是从electron-egg\frontend 项目npm run build生成的，改了界面，要重新生成 然后重新复制到electron-egg\public下面覆盖掉
+
+---
+Error occurred in handler for 'controller.example.dbOperation': Error: The module '\\?\D:\electronproj\githubdemo\iot\oks\tastekplus\tastekelectrwas compiled against a different Node.js version using
+NODE_MODULE_VERSION 83. This version of Node.js requires
+NODE_MODULE_VERSION 89. Please try re-compiling or re-installing
+the module (for instance, using `npm rebuild` or `npm install`).
+解决方案：删除node_module文件夹和.lock文件
+执行npx electron-rebuild
+---
+//console.log(this.demoDB);
+//console.log(this.demoDB.getFilePath(this.demoDB.name));打印数据库存放位置
+找到数据库文件存放位置 C:\Users\yxb\AppData\Roaming\tastek\data\demo.json
+
+
+加菜单
+D:\electronproj\githubdemo\iot\oks\tastekplus\tastekelectron\frontend\src\layouts\AppSider.vue 设置菜单图标，名称，路由根目录
+config/router.config.js 设置菜单 路由跳转，默认打开 菜单redirect，子菜单children 路由
+
+subMenu.js设置子菜单样式
+
+
+---
+/**
+   * 初始化db
+   */
+  initDB (name, opt = {}) {
+    let options = Object.assign({
+      timeout: 5000,
+    }, opt);
+
+    // 存储类型：db文件、内存(:memory:)
+    let isFileDB = false;
+    if (path.extname(name) == '.db') {
+      name = this.getFilePath(name);
+      isFileDB = true;
+    }
+
+    const db = new Database(name, options);
+
+    // 如果是文件类型，判断文件是否创建成功
+    if (isFileDB) {
+      assert(fs.existsSync(name), `error: storage ${name} not exists`);
+    }
+
+    return db;
+  }
+如果不是.db的文件名 就 存到内存，否则存到.db文件
+
+
+---
+新增ipc方法的时候，要在ipcApiRoute 里面添加一条对应方法的属性 例如  importExcel: 'controller.example.importExcel',
+否则self.$ipcInvoke(ipcApiRoute.importExcel,path) 会报错
+
+
+---
+热重载
+frontend 开起来，端口号记录下比如8080
+主进程修改端口
+  config.mainServer = {
+    host: '127.0.0.1',
+    port: 8081
+  };
+主进程端开起来
+----
+前端渲染进程和主进程通信
+同步：
+比如sendNotification（参数，回调）
+回调里面可以监听主进程处理好的结果
+回调函数传给主进程，回调函数可以reply('渲染进程监听的channel',主进程处理结果)
