@@ -37,23 +37,23 @@ module.exports = {
   // 设为false打包时不生成.map文件
   productionSourceMap: false,
   // 这里写你调用接口的基础路径，来解决跨域，如果设置了代理，那你本地开发环境的axios的baseUrl要写为 '' ，即空字符串
-   //设置跨域代理
-   devServer: {
+  //设置跨域代理
+  devServer: {
     historyApiFallback: true,
     hot: true,
     inline: true,
     stats: { colors: true },
     proxy: {
-        //匹配代理的url
-        '/api': {
+      //匹配代理的url
+      '/api': {
         // 目标服务器地址
-          target: 'http://localhost:8000',
-          //路径重写
-          pathRewrite: {'^/api' : '/api'},
-          changeOrigin: true
-        }
-     }
-},
+        target: 'http://localhost:8000',
+        //路径重写
+        pathRewrite: { '^/api': '/api' },
+        changeOrigin: true
+      }
+    }
+  },
   css: {
     loaderOptions: {
       less: {
